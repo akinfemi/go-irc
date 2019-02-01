@@ -2,8 +2,28 @@ package server
 
 import (
 	"fmt"
+	"net"
 	"os"
 )
+
+func launchServer(port string) {
+	conn, err := net.Listen("tcp4", port) //support (for now ipv4)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	defer conn.Close()
+	sv := &Server{Users: []*User{}, Channels: []*Channel{}}
+	for { //accept connections
+		fmt.Println("Waiting for connections...")
+		c, err := conn.Accept()
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		go sv.handleConnection(c) //multi-client (non-blocking)
+	}
+}
 
 func main() {
 	args := os.Args

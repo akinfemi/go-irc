@@ -7,6 +7,7 @@ import (
 //User each user (connection)
 type User struct {
 	Nick            string
+	Sv              *Server
 	UserChannels    []*Channel
 	PrivateMessages map[string][]Message
 }

@@ -28,20 +28,19 @@ func (sv *Server) newUser(name string) {
 }
 
 func (sv *Server) handleCommand(message string) {
-	switch message[:2] {
+	tokens := strings.Split(message, " ")
+	switch tokens[0] {
 	case "lc":
 		listChannels(sv)
 	case "ls":
 		listUsers(sv)
 	case "nc":
-		tokens := strings.Split(message, " ")
 		if len(tokens) != 2 {
 			fmt.Println("Invalid number of arguments")
 			return
 		}
 		sv.newChannel(tokens[1])
 	case "nu":
-		tokens := strings.Split(message, " ")
 		if len(tokens) != 2 {
 			fmt.Println("Invalid number of arguments")
 			return
