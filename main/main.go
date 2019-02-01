@@ -1,9 +1,11 @@
-package server
+package main
 
 import (
 	"fmt"
 	"net"
 	"os"
+
+	"github.com/akinfemi/go-irc/server"
 )
 
 func launchServer(port string) {
@@ -13,7 +15,7 @@ func launchServer(port string) {
 		return
 	}
 	defer conn.Close()
-	sv := &Server{Users: []*User{}, Channels: []*Channel{}}
+	sv := &server.Server{Users: []*server.User{}, Channels: []*server.Channel{}}
 	for { //accept connections
 		fmt.Println("Waiting for connections...")
 		c, err := conn.Accept()
@@ -21,7 +23,7 @@ func launchServer(port string) {
 			fmt.Println(err)
 			return
 		}
-		go sv.handleConnection(c) //multi-client (non-blocking)
+		go sv.HandleConnection(c) //multi-client (non-blocking)
 	}
 }
 

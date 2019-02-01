@@ -32,11 +32,13 @@ func (sv *Server) getUser(username string) (*User, error) {
 	return nil, errors.New("User doesn't exist")
 }
 
-func (sv *Server) handleConnection(c net.Conn) {
+//HandleConnection handle each client request
+func (sv *Server) HandleConnection(c net.Conn) {
 	fmt.Printf("Connected to %s\n", c.RemoteAddr().String())
 	u := &User{}
+	u.Conn = c
 	for {
-		data, err := bufio.NewReader(c).ReadString('\n')
+		data, err := bufio.NewReader(u.Conn).ReadString('\n')
 		if err != nil {
 			fmt.Println(err)
 			return
@@ -46,11 +48,12 @@ func (sv *Server) handleConnection(c net.Conn) {
 			break
 		}
 		if message[0] == '/' {
-			u.handleIRCCommand(message[1:])
+			result := u.handleIRCCommand(message[1:])
+			u.Conn.Write([]byte(result + "\n"))
 		} else {
-			sv.handleCommand(message)
+			result := sv.handleCommand(message)
+			u.Conn.Write([]byte(result + "\n"))
 		}
-		c.Write([]byte("From server: " + message + "\n"))
 	}
-	c.Close()
+	u.Conn.Close()
 }

@@ -2,12 +2,14 @@ package server
 
 import (
 	"fmt"
+	"net"
 )
 
 //User each user (connection)
 type User struct {
 	Nick            string
 	Sv              *Server
+	Conn            net.Conn
 	UserChannels    []*Channel
 	PrivateMessages map[string][]Message
 }
