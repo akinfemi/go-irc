@@ -35,8 +35,7 @@ func (sv *Server) getUser(username string) (*User, error) {
 //HandleConnection handle each client request
 func (sv *Server) HandleConnection(c net.Conn) {
 	fmt.Printf("Connected to %s\n", c.RemoteAddr().String())
-	u := &User{}
-	u.Conn = c
+	u := &User{Conn: c}
 	for {
 		data, err := bufio.NewReader(u.Conn).ReadString('\n')
 		if err != nil {

@@ -1,4 +1,4 @@
-package client
+package main
 
 import (
 	"log"
@@ -69,7 +69,7 @@ func SetFocus(name string) func(g *gocui.Gui) error {
 	}
 }
 
-func InitViews() {
+func main() {
 	g, err := gocui.NewGui(gocui.OutputNormal)
 	if err != nil {
 		log.Panicln(err)
@@ -83,16 +83,26 @@ func InitViews() {
 	users := NewBoxView("users", 0, maxY/2+1, maxX/4, maxY-2)
 	input := NewInput("input", maxX/4+1, maxY-4, maxX-1, maxY-2)
 	focus := gocui.ManagerFunc(SetFocus("input"))
+
 	g.SetManager(chat, channels, users, input, focus)
 
 	if err := g.SetKeybinding("", gocui.KeyCtrlC, gocui.ModNone, quit); err != nil {
 		log.Panicln(err)
 	}
+	// if err := g.SetKeybinding("input", gocui.KeyEnter, gocui.ModNone, read); err != nil {
+	// 	log.Panicln(err)
+	// }
 
 	if err := g.MainLoop(); err != nil && err != gocui.ErrQuit {
 		log.Panicln(err)
 	}
 }
+
+// func read(g *gocui.Gui, v *gocui.View) error {
+// 	userInput := v.Buffer()
+// 	v.Clear()
+
+// }
 
 func quit(g *gocui.Gui, v *gocui.View) error {
 	return gocui.ErrQuit

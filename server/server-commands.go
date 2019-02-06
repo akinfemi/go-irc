@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-func listChannels(sv *Server) string {
+func (sv *Server) listChannels() string {
 	result := []string{}
 	fmt.Println("here", len(sv.Channels))
 	for _, channel := range sv.Channels {
@@ -17,7 +17,7 @@ func listChannels(sv *Server) string {
 	return ""
 }
 
-func listUsers(sv *Server) string {
+func (sv *Server) listUsers() string {
 	result := []string{}
 	for _, users := range sv.Users {
 		result = append(result, users.Nick)
@@ -42,9 +42,9 @@ func (sv *Server) handleCommand(message string) string {
 	tokens := strings.Split(message, " ")
 	switch tokens[0] {
 	case "lc":
-		return listChannels(sv)
+		return sv.listChannels()
 	case "lu":
-		return listUsers(sv)
+		return sv.listUsers()
 	case "nc":
 		if len(tokens) != 2 {
 			return "Invalid number of arguments"

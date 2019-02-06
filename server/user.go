@@ -14,14 +14,6 @@ type User struct {
 	PrivateMessages map[string][]Message
 }
 
-//Users functions each user must implement
-type Users interface {
-	leaveChan(channel string)
-	joinChan(channel string)
-	invite(usr User, ch *Channel)
-	sendMessage(msg Message, dest interface{})
-}
-
 func (u User) String() string {
 	return fmt.Sprintf("Name: %s\n", u.Nick)
 }
@@ -59,11 +51,11 @@ func (u *User) joinChan(ch *Channel) {
 	u.UserChannels = append(u.UserChannels, ch)
 }
 
-func (u User) invite(usr *User, ch *Channel) {
+func (u *User) invite(usr *User, ch *Channel) {
 	usr.joinChan(ch)
 }
 
-func (u User) sendMessage(msg Message, dest interface{}) {
+func (u *User) sendMessage(msg Message, dest interface{}) {
 	switch v := dest.(type) {
 	case Channel:
 		v.Messages = append(v.Messages, &msg)
