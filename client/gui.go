@@ -19,6 +19,7 @@ type Client struct {
 
 var client = &Client{connected: false, conn: nil, sv: nil}
 
+//Reply : Message from server
 type Reply struct {
 	command string
 	state   string
@@ -96,8 +97,14 @@ func SetFocus(name string) func(g *gocui.Gui) error {
 	}
 }
 
-func updateViewList(v *gocui.View, users []string) error {
-	return nil
+//UpdateViewList : Print []string to screen
+func UpdateViewList(v *gocui.View, entries []string) error {
+	allEntries := ""
+	for _, entry := range entries {
+		allEntries += entry + "\n"
+	}
+	_, err := v.Write([]byte(allEntries))
+	return err
 }
 
 func quit(g *gocui.Gui, v *gocui.View) error {

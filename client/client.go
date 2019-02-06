@@ -16,10 +16,10 @@ func handleServerReply(g *gocui.Gui, reply string) error {
 	switch r.command {
 	case "lu":
 		v, _ := g.View("users")
-		return updateViewList(v, r.body)
+		return UpdateViewList(v, r.body)
 	case "lc":
 		v, _ := g.View("channels")
-		return updateViewList(v, r.body)
+		return UpdateViewList(v, r.body)
 	default:
 		fmt.Printf("%s not implemented yet\n", r.command)
 	}
