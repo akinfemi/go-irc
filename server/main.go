@@ -13,7 +13,7 @@ func launchServer(port string) {
 		return
 	}
 	defer conn.Close()
-	sv := &Server{Users: []*User{}, Channels: []*Channel{}}
+	sv := &Server{state: 0, Users: []*User{}, Channels: []*Channel{}}
 	for { //accept connections
 		fmt.Println("Waiting for connections...")
 		c, err := conn.Accept()

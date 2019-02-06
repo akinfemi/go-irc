@@ -2,14 +2,30 @@ package main
 
 import (
 	"bufio"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"net"
 	"strings"
 )
 
+const (
+	msgMode  = 1
+	chanMode = 2
+	neutMode = 0
+)
+
+//Reply : Message from server
+type Reply struct {
+	command string
+	state   int
+	body    []string
+}
+
 // Server IRC Server
 type Server struct {
+	state    int
 	Users    []*User
 	Channels []*Channel
 }
@@ -48,11 +64,25 @@ func (sv *Server) HandleConnection(c net.Conn) {
 		}
 		if message[0] == '/' {
 			result := u.handleIRCCommand(message[1:])
-			u.Conn.Write([]byte(result + "\n"))
+			reply := Reply{command: message, state: sv.state, body: strings.Split(result, "\n")}
+			b, err := json.Marshal(reply)
+			must(err)
+			u.Conn.Write(b)
 		} else {
-			result := sv.handleCommand(message)
-			u.Conn.Write([]byte(result + "\n"))
+			result := []string{}
+			result, err = sv.handleCommand(message)
+			must(err)
+			reply := Reply{command: message, state: sv.state, body: result}
+			b, err := json.Marshal(reply)
+			must(err)
+			u.Conn.Write(b)
 		}
 	}
 	u.Conn.Close()
+}
+
+func must(err error) {
+	if err != nil {
+		log.Panicln(err)
+	}
 }

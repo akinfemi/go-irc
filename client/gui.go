@@ -5,7 +5,6 @@ import (
 	"net"
 	"sync"
 
-	"github.com/akinfemi/go-irc/server"
 	"github.com/jroimartin/gocui"
 )
 
@@ -13,18 +12,10 @@ import (
 type Client struct {
 	connected bool
 	conn      net.Conn
-	sv        *server.Server
 	mutex     sync.Mutex
 }
 
-var client = &Client{connected: false, conn: nil, sv: nil}
-
-//Reply : Message from server
-type Reply struct {
-	command string
-	state   string
-	body    []string
-}
+var client = &Client{connected: false, conn: nil}
 
 //Input Text box
 type Input struct {

@@ -10,6 +10,13 @@ import (
 	"github.com/jroimartin/gocui"
 )
 
+//Reply : Message from server
+type Reply struct {
+	command string
+	state   int
+	body    []string
+}
+
 func handleServerReply(g *gocui.Gui, reply string) error {
 	var r Reply
 	must(json.Unmarshal([]byte(reply), &r))

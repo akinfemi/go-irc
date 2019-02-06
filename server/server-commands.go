@@ -1,31 +1,26 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 )
 
-func (sv *Server) listChannels() string {
+func (sv *Server) listChannels() []string {
 	result := []string{}
 	fmt.Println("here", len(sv.Channels))
 	for _, channel := range sv.Channels {
 		result = append(result, channel.Name)
 	}
-	if len(result) > 0 {
-		return strings.Join(result, "\n")
-	}
-	return ""
+	return result
 }
 
-func (sv *Server) listUsers() string {
+func (sv *Server) listUsers() []string {
 	result := []string{}
 	for _, users := range sv.Users {
 		result = append(result, users.Nick)
 	}
-	if len(result) > 0 {
-		return strings.Join(result, "\n")
-	}
-	return ""
+	return result
 }
 
 func (sv *Server) addChannel(name string) {
@@ -38,25 +33,23 @@ func (sv *Server) addUser(name string) {
 	sv.Users = append(sv.Users, u)
 }
 
-func (sv *Server) handleCommand(message string) string {
+func (sv *Server) handleCommand(message string) ([]string, error) {
 	tokens := strings.Split(message, " ")
 	switch tokens[0] {
 	case "lc":
-		return sv.listChannels()
+		return sv.listChannels(), nil
 	case "lu":
-		return sv.listUsers()
+		return sv.listUsers(), nil
 	case "nc":
 		if len(tokens) != 2 {
-			return "Invalid number of arguments"
+			break
 		}
 		sv.addChannel(tokens[1])
 	case "nu":
 		if len(tokens) != 2 {
-			return "Invalid number of arguments"
+			break
 		}
 		sv.addUser(tokens[1])
-	default:
-		return "Server doesn't understand the command"
 	}
-	return "Success"
+	return []string{}, errors.New("Invalid Command + Args")
 }
