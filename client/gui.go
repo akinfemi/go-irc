@@ -1,6 +1,8 @@
 package main
 
 import (
+	"bufio"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net"
@@ -20,6 +22,12 @@ type Client struct {
 }
 
 var client = &Client{connected: false, conn: nil, sv: nil}
+
+type Reply struct {
+	command string
+	state   string
+	body    []string
+}
 
 //Input Text box
 type Input struct {
@@ -112,6 +120,26 @@ func main() {
 	must(g.MainLoop())
 }
 
+func updateViewList(v *gocui.View, users []string) error {
+	return nil
+}
+
+func handleServerReply(g *gocui.Gui, reply string) error {
+	var r Reply
+	must(json.Unmarshal([]byte(reply), &r))
+	switch r.command {
+	case "lu":
+		v, _ := g.View("users")
+		return updateViewList(v, r.body)
+	case "lc":
+		v, _ := g.View("channels")
+		return updateViewList(v, r.body)
+	default:
+		fmt.Printf("%s not implemented yet\n", r.command)
+	}
+	return nil
+}
+
 func runCommand(g *gocui.Gui, userInput string) {
 	tokens := strings.Split(userInput, " ")
 	if tokens[0] == "/connect" {
@@ -124,7 +152,10 @@ func runCommand(g *gocui.Gui, userInput string) {
 		}
 		client.mutex.Unlock()
 	} else {
-		fmt.Fprintf(client.conn, userInput)
+		fmt.Fprintf(client.conn, userInput)                         //send input to server
+		reply, err := bufio.NewReader(client.conn).ReadString('\n') //response from server
+		must(err)
+		must(handleServerReply(g, reply))
 	}
 }
 
