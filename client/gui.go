@@ -94,9 +94,7 @@ func SetFocus(name string) func(g *gocui.Gui) error {
 
 func main() {
 	g, err := gocui.NewGui(gocui.OutputNormal)
-	if err != nil {
-		log.Panicln(err)
-	}
+	must(err)
 	defer g.Close()
 
 	g.Cursor = true
@@ -109,31 +107,22 @@ func main() {
 
 	g.SetManager(chat, channels, users, input, focus)
 
-	if err := g.SetKeybinding("", gocui.KeyCtrlC, gocui.ModNone, quit); err != nil {
-		log.Panicln(err)
-	}
-	if err := g.SetKeybinding("input", gocui.KeyEnter, gocui.ModNone, read); err != nil {
-		log.Panicln(err)
-	}
-
-	if err := g.MainLoop(); err != nil && err != gocui.ErrQuit {
-		log.Panicln(err)
-	}
+	must(g.SetKeybinding("", gocui.KeyCtrlC, gocui.ModNone, quit))
+	must(g.SetKeybinding("input", gocui.KeyEnter, gocui.ModNone, read))
+	must(g.MainLoop())
 }
 
 func runCommand(g *gocui.Gui, userInput string) {
 	tokens := strings.Split(userInput, " ")
 	if tokens[0] == "/connect" {
+		client.mutex.Lock()
 		if !client.connected {
 			conn, err := net.Dial("tcp4", string(tokens[1]))
-			if err != nil {
-				log.Panicln(err)
-			}
-			client.mutex.Lock()
+			must(err)
 			client.connected = true
 			client.conn = conn
-			client.mutex.Unlock()
 		}
+		client.mutex.Unlock()
 	} else {
 		fmt.Fprintf(client.conn, userInput)
 	}
@@ -143,9 +132,7 @@ func read(g *gocui.Gui, v *gocui.View) error {
 	userInput := strings.TrimSpace(v.Buffer())
 	v.Clear()
 	inputView, err := g.View("input")
-	if err != nil {
-		log.Panicln(err)
-	}
+	must(err)
 	v.SetCursor(inputView.Origin())
 	go runCommand(g, userInput)
 	return nil
@@ -153,4 +140,10 @@ func read(g *gocui.Gui, v *gocui.View) error {
 
 func quit(g *gocui.Gui, v *gocui.View) error {
 	return gocui.ErrQuit
+}
+
+func must(err error) {
+	if err != nil && err != gocui.ErrQuit {
+		log.Panicln(err)
+	}
 }
